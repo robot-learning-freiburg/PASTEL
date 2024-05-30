@@ -1,5 +1,5 @@
 # PASTEL
-[**arXiv**](https://arxiv.org/abs/) | [**Website**](http://pastel.cs.uni-freiburg.de/) | [**Video**](https://youtu.be/fC4vapiJTb8)
+[**arXiv**](https://arxiv.org/abs/2405.19035) | [**Website**](http://pastel.cs.uni-freiburg.de/) | [**Video**](https://youtu.be/fC4vapiJTb8)
 
 This repository is the official implementation of the paper:
 
@@ -8,7 +8,7 @@ This repository is the official implementation of the paper:
 > [Niclas Vödisch](https://vniclas.github.io/)&ast;, [Kürsat Petek](http://www2.informatik.uni-freiburg.de/~petek/)&ast;, [Markus Käppeler](https://rl.uni-freiburg.de/people/kaeppelm)&ast;, [Abhinav Valada](https://rl.uni-freiburg.de/people/valada), and [Wolfram Burgard](https://www.utn.de/person/wolfram-burgard/). <br>
 > &ast;Equal contribution. <br> 
 > 
-> *arXiv preprint arXiv:2405.*, 2024
+> *arXiv preprint arXiv:2405.19035*, 2024
 
 <p align="center">
   <img src="./assets/pastel_teaser.png" alt="Overview of PASTEL approach" width="800" />
@@ -19,7 +19,7 @@ If you find our work useful, please consider citing our paper:
 @article{voedisch2024pastel,
   title={A Good Foundation is Worth Many Labels: Label-Efficient Panoptic Segmentation},
   author={Vödisch, Niclas and Petek, Kürsat and Käppeler, Markus and Valada, Abhinav and Burgard, Wolfram},
-  journal={arXiv preprint arXiv:2405.},
+  journal={arXiv preprint arXiv:2405.19035},
   year={2024}
 }
 ```
