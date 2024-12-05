@@ -1,0 +1,71 @@
+# pytorch_lightning==1.8.6
+seed_everything: 0
+
+trainer:
+  max_epochs: 1
+  accelerator: gpu
+  logger: False
+
+
+model:
+  dinov2_vit_model: "vitb14"
+  num_classes: ${data.init_args.num_classes}
+  num_neighbors: 5
+  upsample_factor: 14.0
+
+
+data:
+  class_path: datasets.pascal_voc.PascalVOCDataModule
+  init_args:
+    cfg_dataset:
+      name: "pascal_voc"
+      path: "data/pascal_voc"
+      feed_img_size: ${data_params.image_size_original}
+      offsets: [0]
+      center_heatmap_sigma: 8
+      remove_classes: []
+    num_classes: 21
+    batch_size: 1
+    num_workers: 8
+    transform_train:
+      - class_path: utils.transforms.ToTensor
+      - class_path: utils.transforms.Resize
+        init_args:
+          size: ${data_params.image_size_input}
+      - class_path: utils.transforms.ImageNormalize
+        init_args:
+          mean: ${data_params.image_mean}
+          std: ${data_params.image_std}
+    transform_test:
+      - class_path: utils.transforms.ToTensor
+      - class_path: utils.transforms.Resize
+        init_args:
+          size: ${data_params.image_size_input}
+      - class_path: utils.transforms.ImageNormalize
+        init_args:
+          mean: ${data_params.image_mean}
+          std: ${data_params.image_std}
+    label_mode: "pascal_voc"
+    train_sample_indices: null
+    test_sample_indices: [16, 202, 219, 928, 1032, 2085, 2307, 2397, 2511, 3353, 3529, 4037, 4238, 4393, 4530, 4588, 5425, 9082, 9289, 10388]
+    train_set: "train"
+    test_set: "train"
+
+
+data_params:
+  image_size_original: [512, 512]
+  image_size_input: [504, 504]
+  image_mean: [0.485, 0.456, 0.406]
+  image_std: [0.229, 0.224, 0.225]
+
+ckpt_path: null
+
+optimizer:
+  class_path: torch.optim.Adam
+  init_args:
+    lr: 0.001
+
+lr_scheduler:
+  class_path: torch.optim.lr_scheduler.CosineAnnealingLR
+  init_args:
+    T_max: ${trainer.max_epochs}

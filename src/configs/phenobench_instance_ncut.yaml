@@ -1,0 +1,96 @@
+# pytorch_lightning==1.8.6
+seed_everything: 0
+
+trainer:
+  accelerator: gpu
+  strategy: ddp_find_unused_parameters_false
+  logger: False
+
+model:
+  semantic_model:
+    class_path: semantic_fine_tuning.SemanticFineTuner
+    init_args:
+      dinov2_vit_model: "vitb14"
+      num_classes: ${data.init_args.num_classes}
+      output_size: ${data_params.image_size_original}
+      upsample_factor: 14.0
+      head: "mlp"
+      ignore_index: 255
+      top_k_percent_pixels: 0.2
+      test_multi_scales: [ 1, 2, 3 ]
+      test_multi_scales_stride_divider: [ 2, 2, 2 ]
+      test_plot: False
+      test_save_dir: null
+  semantic_model_ckpt: "checkpoints/phenobench/semantic_phenobench-v9.ckpt"
+  boundary_model:
+    class_path: boundary_fine_tuning.BoundaryFineTuner
+    init_args:
+      dinov2_vit_model: "vitb14"
+      output_size: ${data_params.image_size_original}
+      mode: "direct"
+      upsample_factor: 4.0
+      head: "mlp"
+      neighbor_radius: 1.5
+      threshold_boundary: null
+      num_boundary_neighbors: 1
+      test_multi_scales: [3, 4, 5]
+      test_multi_scales_stride_divider: [ 2, 2, 2 ]
+      boundary_margin: ${model.boundary_margin}
+      test_plot: False
+  boundary_model_ckpt: "checkpoints/phenobench/boundary_phenobench-v9.ckpt"
+  do_post_processing: True
+  boundary_margin: 5
+  boundary_min_pixel: 50
+  structure_connectivity: [[0, 1, 0], [1, 1, 1], [0, 1, 0]]
+  instance_min_pixel: [ 100, 50 ]
+  mode: "ncut"
+  output_size: ${data_params.image_size_original}
+  upsample_factor_affinity_map: 5.0
+  neighbor_radius_affinity_matrix: 5
+  beta: 70.0
+  eigen_tol: 1e-6
+  eigen_vec_hist_bins: 10
+  ncut_threshold: 0.002
+  eigen_vec_hist_ratio: 0.03
+  eigen_vec_thresholds: 12
+  threshold_boundary: 0.98
+  test_plot: False
+  test_save_dir: "test/phenobench"
+  test_save_vis: True
+  debug_plot: False
+
+data:
+  class_path: datasets.phenobench.PhenoBenchDataModule
+  init_args:
+    cfg_dataset:
+      name: "phenobench"
+      path: "data/phenobench"
+      feed_img_size: ${data_params.image_size_original}
+      offsets: [ 0 ]
+      center_heatmap_sigma: 8
+      remove_classes: [ ]
+    num_classes: 2
+    batch_size: 1
+    num_workers: 2
+    transform_train: []
+    transform_test:
+      - class_path: utils.transforms.ToTensor
+      - class_path: utils.transforms.Resize
+        init_args:
+          size: ${data_params.image_size_input}
+      - class_path: utils.transforms.MaskPostProcess
+      - class_path: utils.transforms.ImageNormalize
+        init_args:
+          mean: ${data_params.image_mean}
+          std: ${data_params.image_std}
+    label_mode: "phenobench"
+    train_sample_indices: []
+#    test_sample_indices: [0, 100, 200, 300, 400, 500, 600, 700]
+    test_sample_indices: null
+    test_set: "test"
+
+data_params:
+  image_size_original: [1024, 1024]
+  image_size_input: [1022, 1022]
+  image_mean: [0.485, 0.456, 0.406]
+  image_std: [0.229, 0.224, 0.225]
